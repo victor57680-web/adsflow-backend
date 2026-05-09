@@ -11,7 +11,10 @@ require('dotenv').config();
 const app = express();
 app.use(cors()); // Autorise ton app HTML à appeler ce serveur
 app.use(express.json());
-
+// Servir l'app HTML
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/adsflow_v4.html');
+});
 // -------------------------------------------------------
 // Initialisation du client Google Ads
 // -------------------------------------------------------
