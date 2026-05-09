@@ -69,29 +69,28 @@ Réponds UNIQUEMENT en JSON valide, sans markdown, sans backticks, sans commenta
 {"headlines":["titre1 max30car","titre2 max30car","titre3 max30car","titre4 max30car","titre5 max30car"],"descriptions":["desc1 max90car","desc2 max90car"],"callExtension":"Appeler VDKustom max25car","negativeKeywords":["kw1","kw2","kw3","kw4","kw5"],"bidStrategy":"strategie encheres pour maximiser appels locaux","localTip":"conseil specifique pour maximiser les appels dans cette zone","estimatedCTR":"x.x%","estimatedCPA":"€X–€Y par appel"}`;
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
+  },
+  body: JSON.stringify({
+    model: 'llama-3.3-70b-versatile',
+    max_tokens: 1000,
+    messages: [{ role: 'user', content: prompt }]
+  })
+});
 
-    if (!response.ok) {
-      const err = await response.text();
-      throw new Error(`Anthropic API erreur ${response.status}: ${err}`);
-    }
+if (!response.ok) {
+  const err = await response.text();
+  throw new Error(`Groq API erreur ${response.status}: ${err}`);
+}
 
-    const data = await response.json();
-    const raw = data.content?.[0]?.text || '';
-    const result = JSON.parse(raw.replace(/```json|```/g, '').trim());
-
+const data = await response.json();
+const raw = data.choices?.[0]?.message?.content || '';
+const result = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    
     res.json({ success: true, ad: result });
   } catch (err) {
     console.error('Erreur génération IA:', err.message);
